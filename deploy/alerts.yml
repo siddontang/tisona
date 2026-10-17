@@ -1,0 +1,18 @@
+groups:
+  - name: resonate-cloud
+    rules:
+      - alert: ResonateMetricsUnavailable
+        expr: up{job=~"resonate-cloud|resonate-engine"} == 0
+        for: 2m
+        annotations:
+          summary: Resonate gateway or engine metrics are unavailable
+      - alert: ResonateApiErrors
+        expr: sum(rate(cloud_http_requests_total{status=~"5.."}[5m])) / sum(rate(cloud_http_requests_total[5m])) > 0.05 and sum(increase(cloud_http_requests_total[5m])) > 10
+        for: 5m
+        annotations:
+          summary: More than five percent of recent requests are failing
+      - alert: ResonateApiLatency
+        expr: histogram_quantile(0.95, sum by (le) (rate(cloud_http_duration_seconds_bucket[5m]))) > 5
+        for: 5m
+        annotations:
+          summary: Gateway p95 response time exceeds five seconds

@@ -1,0 +1,10 @@
+TiSona
+Powered by Resonate and TiDB.
+
+This repository contains the TiSona service and Console originally developed
+alongside the Resonate monorepo. It uses the Resonate engine and SDK under
+the Apache License, Version 2.0. The engine remains unmodified and is fetched
+from the upstream revision recorded in engine-source.json.
+
+Resonate upstream: https://github.com/resonatehq/resonate
+Copyright notices and licenses in upstream dependencies remain applicable.

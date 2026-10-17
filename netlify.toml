@@ -1,0 +1,9 @@
+[build]
+  command = "npm run build:console"
+  publish = ".netlify-dist"
+
+[build.environment]
+  NODE_VERSION = "22"
+
+# Set TISONA_API_ORIGIN in the Netlify project's environment. It must be
+# the HTTPS origin of the separately hosted TiSona gateway, not this site.

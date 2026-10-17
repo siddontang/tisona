@@ -1,0 +1,25 @@
+[Unit]
+Description=Resonate durable execution service
+After=network-online.target
+Wants=network-online.target
+
+[Service]
+Type=simple
+User=resonate
+Group=resonate
+WorkingDirectory=/opt/tisona
+EnvironmentFile=/etc/resonate-cloud/service.env
+ExecStart=/usr/bin/node dev.mjs
+Restart=on-failure
+RestartSec=5
+TimeoutStopSec=20
+KillMode=control-group
+UMask=0077
+NoNewPrivileges=true
+PrivateTmp=true
+ProtectSystem=strict
+ProtectHome=true
+ReadWritePaths=/var/lib/resonate-cloud
+
+[Install]
+WantedBy=multi-user.target

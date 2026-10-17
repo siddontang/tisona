@@ -1,0 +1,6 @@
+{
+  "repository": "https://github.com/resonatehq/resonate.git",
+  "revision": "28dfd016aa970332dc283e2431c406845e2ccc8f",
+  "path": "impl/server/core",
+  "version": "0.10.1"
+}

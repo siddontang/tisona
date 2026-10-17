@@ -1,0 +1,42 @@
+:root {
+  color-scheme: light;
+  --page: #f5f7f4; --surface: #ffffff; --surface-2: #f6f9f5; --surface-3: #edf2ec; --stage: #f8faf7;
+  --text: #24312f; --text-2: #496052; --muted: #64766c; --subtle: #64766c; --line: #dbe4dc; --selected: #eaf3e9;
+  --accent: #196c53; --on-accent: #ffffff;
+  --success: #337b56; --success-bg: #edf5ec; --success-border: #a7c8b0;
+  --warning: #906a27; --warning-bg: #faf5e7; --warning-border: #d7c18f;
+  --danger: #9c4b3e; --danger-bg: #fbefeb; --danger-border: #dbb2a7;
+  --info: #2e7092; --info-bg: #edf5f9; --info-border: #9cbed0;
+  --shadow: 0 6px 26px #20362705;
+}
+:root[data-theme="dark"] {
+  color-scheme: dark;
+  --page: #101614; --surface: #18201c; --surface-2: #1c2620; --surface-3: #243028; --stage: #141d18;
+  --text: #e5ede7; --text-2: #c3d4c8; --muted: #a2b6a9; --subtle: #91a699; --line: #34453a; --selected: #263e30;
+  --accent: #8bd3b1; --on-accent: #102b1d;
+  --success: #8bd3a3; --success-bg: #203a2b; --success-border: #426b50;
+  --warning: #e9c77d; --warning-bg: #352e1f; --warning-border: #79653b;
+  --danger: #f0a697; --danger-bg: #3a2823; --danger-border: #815349;
+  --info: #9acbeb; --info-bg: #223340; --info-border: #4e7289;
+  --shadow: 0 6px 26px #00000012;
+}
+html, body { background: var(--page); color: var(--text); }
+.sr-only { position: absolute; width: 1px; height: 1px; padding: 0; margin: -1px; overflow: hidden; clip-path: inset(50%); white-space: nowrap; border: 0; }
+.aside-bottom .sidebar-config { display: flex; align-items: center; justify-content: space-between; gap: 12px; width: 100%; margin: 0; padding: 10px 13px; background: transparent; color: var(--text-2); font-size: 12px; font-weight: 500; }
+.aside-bottom .sidebar-config.active { background: var(--selected); color: var(--accent); }
+.config-panel { max-width: 760px; }
+.config-panel h2 { margin-bottom: 24px; }
+.setting-row { display: flex; align-items: center; justify-content: space-between; gap: 24px; }
+.setting-row > div { max-width: 450px; }
+.setting-row label { margin: 0; font-size: 13px; }
+.setting-row p { margin: 6px 0 0; font-size: 12px; line-height: 1.8; color: var(--muted); }
+.setting-row select { flex: 0 0 150px; width: 150px; font-size: 12px; }
+@media (max-width: 700px) {
+  aside .aside-bottom:has(.sidebar-config) { display: flex; align-items: center; gap: 12px; top: 15px; }
+  .aside-bottom .sidebar-config { width: auto; padding: 7px 9px; font-size: 11px; gap: 8px; }
+}
+@media (max-width: 600px) {
+  .setting-row { flex-direction: column; align-items: stretch; gap: 18px; }
+  .setting-row select { flex: auto; width: 100%; }
+}
+::selection { background: var(--info-border); color: var(--text); }

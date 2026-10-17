@@ -1,0 +1,17 @@
+global:
+  scrape_interval: 15s
+rule_files:
+  - alerts.yml
+scrape_configs:
+  - job_name: resonate-cloud
+    metrics_path: /metrics
+    authorization:
+      credentials_file: /etc/prometheus/resonate-metrics.key
+    static_configs:
+      - targets: [127.0.0.1:8787]
+  - job_name: resonate-engine
+    metrics_path: /metrics/engine
+    authorization:
+      credentials_file: /etc/prometheus/resonate-metrics.key
+    static_configs:
+      - targets: [127.0.0.1:8787]

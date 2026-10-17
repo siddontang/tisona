@@ -1,0 +1,132 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+  <script src="/theme.js"></script>
+  <title>TiSona · Starter project</title>
+  <link rel="stylesheet" href="/theme.css"><link rel="stylesheet" href="/style.css"><link rel="stylesheet" href="/executions.css"><link rel="stylesheet" href="/walkthrough.css"><script type="module" src="/walkthrough.js"></script><link rel="stylesheet" href="/studio.css"><script type="module" src="/example-studio.js"></script><link rel="stylesheet" href="/execution-create.css"><script type="module" src="/execution-create.js"></script><script type="module" src="/worker-guide.js"></script><script type="module" src="/app.js"></script>
+</head>
+<body>
+  <section id="login" class="login" hidden>
+    <div class="brand"><span class="logo" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none"><path d="m5 6 6 6-6 6m8-12 6 6-6 6" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"/></svg></span> TiSona <span class="badge">MVP</span></div>
+    <h1>Durable work.<br>On your workers.</h1>
+    <p>Start tasks, inspect every step, and pick up where you left off.</p>
+    <form id="login-form"><label for="login-key">Administrator credential</label><input id="login-key" type="password" autocomplete="current-password" required placeholder="rc_admin_…"><button>Open project →</button></form>
+    <p class="muted">Use the administrator credential issued when your project was initialized.</p>
+    <p id="login-error" class="error" role="alert"></p>
+    <p class="powered-by">Powered by <strong>Resonate</strong> and <strong>TiDB</strong></p>
+  </section>
+  <div id="shell" hidden>
+    <aside>
+      <div class="brand"><span class="logo" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none"><path d="m5 6 6 6-6 6m8-12 6 6-6 6" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"/></svg></span> TiSona <span class="badge">Cloud</span></div>
+      <div class="project"><span class="project-icon">S</span><div><strong id="project-name">Starter project</strong><small>Single-project preview</small></div></div>
+      <nav aria-label="Project navigation">
+        <button data-tab="overview" class="active">Overview <span>↗</span></button>
+        <button data-tab="examples">Examples <span>◇</span></button>
+        <button data-tab="executions">Executions <span>⌘</span></button>
+        <button data-tab="functions">Functions <span>ƒ</span></button>
+        <button data-tab="workers">Workers <span>◉</span></button>
+        <button data-tab="access">API access <span>↔</span></button>
+      </nav>
+      <div class="aside-bottom"><button data-tab="config" class="sidebar-config">Config <span aria-hidden="true">⚙</span></button><button id="logout" class="text-button">Sign out</button></div>
+    </aside>
+    <main>
+      <header><div><div class="eyebrow">WORKSPACE / STARTER</div><h1 id="page-title">Overview</h1></div><div class="header-actions"><button class="outline" data-tab="new" id="new-execution">+ New execution</button></div></header>
+      <div id="notice" class="notice" role="status"></div>
+      <section data-panel="overview">
+        <div class="overview-intro"><span class="eyebrow">DURABLE EXECUTION FOR AGENTS</span><h2>Keep the progress.<br>Finish the work.</h2><p>Tools fail. People take time to approve. Workers restart. TiSona saves completed steps so your agent can keep going.</p><div class="overview-intro-actions"><button id="overview-try" disabled>Loading demo…</button><button class="text-button" data-tab="access">Use your own worker ↗</button></div></div>
+        <section class="overview-playground" aria-labelledby="overview-playground-title">
+          <div class="overview-playground-heading"><div><h3 id="overview-playground-title">See it work. Try it here.</h3><p>Choose a scenario, then run it. The animation follows the saved execution.</p></div><span class="badge">REAL EXECUTIONS · SIMULATED TOOLS</span></div>
+          <div class="overview-scenarios" role="group" aria-label="Try a durable execution pattern">
+            <button data-overview-example="tool-retry" aria-pressed="true"><span aria-hidden="true">↻</span><strong>Retry a failed tool</strong><small>Keep the completed work</small></button>
+            <button data-overview-example="support-refund" aria-pressed="false"><span aria-hidden="true">◎</span><strong>Wait for approval</strong><small>Resume after a decision</small></button>
+            <button data-overview-example="order-saga" aria-pressed="false"><span aria-hidden="true">↶</span><strong>Recover an order</strong><small>Refund and release stock</small></button>
+            <button data-overview-example="document-pipeline" aria-pressed="false"><span aria-hidden="true">⋈</span><strong>Process in parallel</strong><small>Save each branch’s progress</small></button>
+          </div>
+          <div id="overview-example" class="overview-demo"><div class="overview-loading" role="status">Loading the interactive examples…</div></div>
+        </section>
+        <article class="overview-own-code"><div class="overview-own-heading"><div><span class="eyebrow">USE YOUR OWN CODE</span><h3>From a demo to your agent.</h3><p>Your code runs on your worker. TiSona keeps the execution state, checkpoints and result.</p></div><div class="overview-own-actions"><button class="outline" data-tab="access">Connect your worker →</button><button data-tab="new">Create execution →</button></div></div><ol class="overview-how"><li><span>01</span><div><strong>Write a function</strong><p>Use a Resonate SDK in your preferred language.</p></div></li><li><span>02</span><div><strong>Connect your worker</strong><p>Publish the function and its input schema.</p></div></li><li><span>03</span><div><strong>Start from your agent</strong><p>Call the API or create a run in this Console.</p></div></li></ol></article>
+      </section>
+      <section data-panel="new" hidden aria-label="Create execution">
+        <div id="execution-composer"></div>
+      </section>
+      <section data-panel="examples" hidden>
+        <div class="examples-intro"><span class="badge">REAL EXECUTIONS · SIMULATED TOOLS</span><h2>See it happen.<br>Run it right here.</h2><p>Explore the animation, then run the same scenario live. Progress, decisions and recovery stay together in each example.</p></div>
+        <div id="examples-guide" class="example-guide" hidden><strong>Connect the example worker to run these scenarios.</strong><pre>npm run worker:examples</pre><span class="muted">Run it separately from the service, just like a worker you host yourself.</span></div>
+        <div id="examples-list" class="examples-grid"></div>
+        <p class="muted example-attribution">Patterns inspired by <a href="https://temporal.io/solutions/ai" target="_blank" rel="noreferrer">Temporal's AI use cases</a> and <a href="https://temporal.io/code-exchange" target="_blank" rel="noreferrer">Code Exchange</a>. These are original TiSona examples; payments, messages and document tools are simulated.</p>
+      </section>
+      <section data-panel="executions" hidden>
+        <div id="execution-list-view">
+          <p class="page-description">Every run, from start to finish. Follow its progress and pick up where it left off.</p>
+          <div class="execution-metrics">
+            <div><span>Matching executions</span><strong id="execution-total">—</strong><small id="execution-total-note">Across your project</small></div>
+            <div><span>Pending</span><strong id="execution-pending">—</strong><small>On this page</small></div>
+            <div><span>Resolved</span><strong id="execution-resolved">—</strong><small>On this page</small></div>
+          </div>
+          <article class="execution-catalogue">
+            <div class="catalogue-heading"><h2>Execution history</h2><button id="execution-refresh" class="text-button">Refresh ↻</button></div>
+            <form id="execution-filters" class="execution-filters">
+              <div class="execution-search"><label for="execution-search">Execution ID prefix</label><div><input id="execution-search" type="search" placeholder="Search execution ID…" maxlength="128" autocomplete="off"><button type="submit" class="outline">Search</button></div></div>
+              <div><label for="execution-status">Status</label><select id="execution-status"><option value="">All statuses</option value="pending">Pending</option><option value="resolved">Resolved</option><option value="rejected">Rejected</option><option value="rejected_canceled">Canceled</option><option value="rejected_timedout">Timed out</option></select></div>
+              <div><label for="execution-function">Function</label><select id="execution-function"><option value="">All functions</option></select></div>
+              <div><label for="execution-window">Created</label><select id="execution-window"><option value="">All time</option><option value="3600000">Last hour</option><option value="86400000">Last 24 hours</option><option value="604800000">Last 7 days</option></select></div>
+              <button type="button" class="text-button reset-filters" id="execution-reset">Reset</button>
+            </form>
+            <p id="execution-list-error" class="inline-error" role="status" hidden></p>
+            <div id="execution-loading" class="empty">Loading execution history…</div>
+            <div id="execution-empty" class="empty" hidden><h3>No executions found</h3><p>Try another filter, or start a new execution.</p></div>
+            <div class="table-scroll"><table id="execution-table" class="execution-table" hidden><thead><tr><th>EXECUTION / FUNCTION</th><th>STATUS</th><th>CREATED</th><th>DURATION</th><th></th></tr></thead><tbody></tbody></table></div>
+            <div class="execution-pager"><span id="execution-page-note">Page 1</span><div><button id="execution-previous" class="outline" disabled>← Newer</button><button id="execution-next" class="outline" disabled>Older →</button></div></div>
+          </article>
+        </div>
+        <div id="execution-detail-view" hidden>
+          <button id="execution-back" class="text-button">← All executions</button>
+          <p id="execution-detail-error" class="inline-error" role="status" hidden></p>
+          <div id="execution-detail-loading" class="empty">Loading execution…</div>
+          <div id="execution-detail-content" hidden>
+            <div class="execution-headline"><div><div class="eyebrow">DURABLE EXECUTION</div><div class="execution-title"><h2 id="execution-name"></h2><span id="execution-state" class="state"></span></div><p id="execution-id" class="mono"></p></div><button id="cancel-run" class="danger outline" hidden>Cancel execution</button></div>
+            <div class="execution-facts"><div><span>Created</span><strong id="execution-created"></strong></div><div><span>Settled</span><strong id="execution-settled"></strong></div><div><span>Duration</span><strong id="execution-duration"></strong></div><div><span>Timeout</span><strong id="execution-timeout"></strong></div></div>
+            <article id="live-execution" class="live-execution" hidden><div id="execution-walkthrough"></div></article>
+            <div id="example-context" class="example-context" hidden></div>
+            <div id="wait-actions" aria-live="polite"></div>
+            <p id="execution-truncated" class="inline-warning" hidden>This execution has more steps than can be shown in one response. The steps below are a partial view.</p>
+            <div class="execution-workspace">
+              <article class="step-panel"><div class="section-title"><h2>Execution steps</h2><span id="step-count" class="muted"></span></div><p class="muted">Select a step to inspect its input and result.</p><div id="execution-steps" class="execution-steps" aria-label="Execution steps"></div></article>
+              <article class="step-inspector"><div class="inspector-title"><div><div id="step-kind" class="eyebrow"></div><h2 id="step-name"></h2></div><span id="step-state" class="state"></span></div><p id="step-id" class="mono muted"></p><p id="step-timing" class="muted"></p><p id="step-task" class="muted" hidden></p><div class="payload-heading"><h3 id="step-input-title">Input</h3><span>JSON</span></div><p id="step-input-note" class="muted" hidden>The worker saved the function and version for this checkpoint. Arguments were not recorded.</p><pre id="step-input"></pre><div class="payload-heading"><h3 id="step-output-title">Result</h3><span>JSON</span></div><pre id="step-output"></pre><details class="step-tags"><summary>Step tags</summary><pre id="step-tags"></pre></details></article>
+            </div>
+            <p id="cancel-note" class="muted" hidden>Cancellation stops future work. In-flight external effects may still finish.</p>
+          </div>
+        </div>
+      </section>
+      <section data-panel="functions" hidden><article><div class="section-title"><h2>Registered functions</h2><button id="refresh-functions" class="text-button">Refresh ↻</button></div><p class="muted">Workers publish their function manifest through the API. Registration lists capabilities; it does not indicate worker liveness.</p><div id="function-list"></div></article></section>
+      <section data-panel="workers" hidden><p class="page-description">See which worker processes are reporting and which function versions they support.</p><article><div class="section-title"><h2>Connected workers</h2><button id="refresh-workers" class="text-button">Refresh ↻</button></div><p class="muted">Workers report every 20 seconds. They appear offline after 90 seconds without a heartbeat, or when their credential expires or is revoked. A heartbeat reports process presence, not task health.</p><div id="workers-empty" class="empty">No workers have reported yet. Connect a worker using the API access guide.</div><div class="table-scroll"><table id="workers-table" hidden><thead><tr><th>WORKER</th><th>STATUS</th><th>GROUP / VERSIONS</th><th>LAST SEEN</th></tr></thead><tbody></tbody></table></div></article></section>
+      <section data-panel="access" hidden>
+        <article><div class="section-title"><h2>API keys</h2><button id="refresh-keys" class="text-button">Refresh ↻</button></div><p class="muted">Create a separate key for each client, worker, or metrics collector. Secrets are shown once. To rotate a key, create its replacement, update the consumer, then revoke the old key.</p>
+          <form id="key-form" class="key-form"><div><label for="key-name">Name</label><input id="key-name" maxlength="100" required placeholder="e.g. Production worker"></div><div><label for="key-role">Access</label><select id="key-role"><option value="client">Agent / client</option><option value="worker">Worker</option><option value="metrics">Metrics only</option><option value="admin">Administrator</option></select></div><div><label for="key-days">Expires in</label><select id="key-days"><option value="30">30 days</option><option value="7">7 days</option><option value="90">90 days</option></select></div><button id="create-key">Create key</button></form>
+          <div id="key-created" class="key-created" hidden><strong>Save this key now. It will not be shown again.</strong><pre id="key-secret"></pre><button id="dismiss-key" class="outline">I've saved it</button></div>
+          <div class="table-scroll"><table id="keys-table"><thead><tr><th>NAME / PREFIX</th><th>ACCESS</th><th>STATUS</th><th>EXPIRES</th><th></th></tr></thead><tbody></tbody></table></div>
+        </article>
+        <article><div class="section-title"><h2>Project connection</h2><span id="worker-summary" class="status">Checking workers…</span></div><p class="muted">Your worker runs the code. Connect it to this endpoint using a Worker API key, then publish its function manifest.</p><label>Endpoint</label><pre id="endpoint"></pre></article>
+        <article><h2>Connect your worker</h2><p>Choose a Resonate SDK for your worker. Run it separately from the service and keep credentials in your environment or a secret file.</p>
+          <ul class="sdk-list" aria-label="Resonate SDKs">
+            <li><div><strong>TypeScript / JavaScript</strong><span>npm · Node.js</span></div><code>@resonatehq/sdk</code><a href="https://docs.resonatehq.io/develop/typescript" target="_blank" rel="noreferrer" aria-label="TypeScript and JavaScript SDK quickstart">Quickstart ↗</a></li>
+            <li><div><strong>Python</strong><span>PyPI · Python 3.12+</span></div><code>resonate-sdk</code><a href="https://docs.resonatehq.io/develop/python" target="_blank" rel="noreferrer" aria-label="Python SDK quickstart">Quickstart ↗</a></li>
+            <li><div><strong>Go</strong><span>Go module · Early release</span></div><code>resonate-sdk-go</code><a href="https://docs.resonatehq.io/develop/go" target="_blank" rel="noreferrer" aria-label="Go SDK quickstart">Quickstart ↗</a></li>
+            <li><div><strong>Java</strong><span>Maven Central · Java 21+ · Early release</span></div><code>io.resonatehq:resonate-sdk-java</code><a href="https://github.com/resonatehq/resonate-sdk-java#quickstart" target="_blank" rel="noreferrer" aria-label="Java SDK quickstart">Quickstart ↗</a></li>
+            <li><div><strong>Rust</strong><span>crates.io</span></div><code>resonate-sdk</code><a href="https://docs.resonatehq.io/develop/rust" target="_blank" rel="noreferrer" aria-label="Rust SDK quickstart">Quickstart ↗</a></li>
+          </ul>
+          <div id="worker-guide"></div>
+        </article><article><h2>Agent API</h2><p>Start with an idempotency key. Save the returned execution ID and query its status later.</p><pre id="api-example"></pre><p class="muted">GET /v1/functions · GET /v1/workers · GET /v1/executions · GET /v1/executions/:id · POST /v1/executions/:id/waits · POST /v1/executions/:id/cancel</p></article>
+        <article><h2>Monitoring</h2><p class="muted">Public readiness checks and authenticated Prometheus metrics. Use a Metrics only key for scraping.</p><pre id="metrics-example"></pre></article>
+        <article><div class="section-title"><h2>Recent administrative activity</h2></div><p class="muted">Actors are identified by their API key. Secret values and execution payloads are excluded.</p><div id="audit-list"></div></article>
+      </section>
+      <section data-panel="config" hidden>
+        <p class="page-description">Personalize your workspace.</p>
+        <article class="config-panel"><h2>Appearance</h2><div class="setting-row"><div><label for="theme">Theme</label><p id="theme-help">System follows your device’s appearance. Your selection is saved automatically in this browser.</p></div><select id="theme" aria-label="Appearance" aria-describedby="theme-help"><option value="system">System</option><option value="light">Light</option><option value="dark">Dark</option></select></div></article>
+      </section>
+      <footer class="project-footer"><span id="expiry"></span><span class="powered-by">Powered by <strong>Resonate</strong> and <strong>TiDB</strong></span></footer>
+    </main>
+  </div>
+</body>
+</html>

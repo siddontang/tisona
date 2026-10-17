@@ -1,0 +1,12 @@
+node_modules/
+.local/
+.vendor/
+.netlify/
+.netlify-dist/
+.env
+.env.*
+!.env.example
+*.pem
+*.key
+*.log
+.DS_Store
