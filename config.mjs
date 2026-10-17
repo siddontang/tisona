@@ -1,11 +1,18 @@
 import { readFile, mkdir, writeFile, chmod } from 'node:fs/promises';
 import { fileURLToPath } from 'node:url';
 import { resolve } from 'node:path';
+import { homedir } from 'node:os';
 import { createHash, sign, createPrivateKey, createPublicKey } from 'node:crypto';
 import { databaseStream } from './network.mjs';
 
 export const dir = fileURLToPath(new URL('.', import.meta.url));
-export const stateDir = resolve(process.env.RESONATE_STATE_DIR ?? resolve(dir, '.local'));
+export function resolveStateDir(env = process.env) {
+  const path = resolve(env.RESONATE_STATE_DIR ?? resolve(env.XDG_STATE_HOME ?? resolve(homedir(), '.local', 'state'), 'tisona'));
+  const checkout = resolve(dir);
+  if (path === checkout || path.startsWith(checkout + '/')) throw new Error('Private runtime state must be outside the source checkout');
+  return path;
+}
+export const stateDir = resolveStateDir();
 export const databaseSocket = resolve(stateDir, 'tidb.sock');
 export const engineDir = resolve(dir, '.vendor/resonate/impl/server/core');
 export const engineBinary = process.env.RESONATE_ENGINE_BINARY ?? resolve(engineDir, `target/${process.env.NODE_ENV === 'production' ? 'release' : 'debug'}/resonate`);
@@ -66,7 +73,7 @@ export function validateConfig(config) {
   return config;
 }
 export async function loadConfig(env = process.env) {
-  const local = resolve(env.RESONATE_STATE_DIR ?? stateDir);
+  const local = resolveStateDir(env);
   const runtime = await optionalJson(env.RESONATE_CONFIG_FILE ?? resolve(local, 'runtime.json'));
   const mode = env.NODE_ENV === 'production' ? 'production' : 'development';
   const external = await secret(env, 'RESONATE_DATABASE_URL');

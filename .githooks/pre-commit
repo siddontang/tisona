@@ -1,0 +1,7 @@
+#!/bin/sh
+set -eu
+if [ -z "${GITLEAKS_BINARY:-}" ]; then
+  GITLEAKS_BINARY=$(git config --local --get tisona.gitleaksBinary || echo gitleaks)
+  export GITLEAKS_BINARY
+fi
+exec node scripts/check-secrets.mjs

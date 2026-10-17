@@ -31,14 +31,15 @@ npm start
 Bootstrap downloads the unmodified Resonate engine at the exact upstream
 revision in `engine-source.json`, builds it under `.vendor/`, and configures
 the local TiDB preview. The TypeScript SDK is pinned to npm version `0.11.5`;
-no sibling Resonate checkout is required. `.vendor/` and `.local/` are ignored.
+no sibling Resonate checkout is required. `.vendor/` is ignored; private runtime
+state is stored outside the checkout.
 
 This repository is licensed under [Apache-2.0](LICENSE); see [NOTICE](NOTICE).
 
 Open <http://127.0.0.1:8787>. Local development opens the Console automatically
 using a normal server-issued session; no key entry is required. Set
 `RESONATE_TEST_AUTO_LOGIN=false` to test manual sign-in with `adminKey` from
-`.local/runtime.json`. Automatic sign-in is disabled in production and when
+`runtime.json` in the private state directory described below. Automatic sign-in is disabled in production and when
 the gateway bind address or public URL is not loopback. API and worker requests
 still require credentials. The **API access** screen creates named client, worker,
 admin, and metrics credentials. A new secret is shown only once. API credentials are never needed in
@@ -317,21 +318,24 @@ own project rows. It checks immutable versions, credential hashing, persisted
 sessions, bootstrap-once behavior, ownership, expiry, and concurrent protection
 of the last administrator. Run live suites against a staging database.
 
-Sanitized evidence is saved to `.local/compatibility.json` and
-`.local/live-results.json`; control-store results are in
-`.local/control-live-results.json`. Runtime logs are under `.local/` as well. The live
+Sanitized evidence is saved as `compatibility.json`, `live-results.json` and
+`control-live-results.json` in the private state directory. Runtime logs are
+stored there as well. The live
 suite is a bounded integration check, not an exhaustive correctness or load
 certification of the MySQL backend on TiDB.
 
 ## Local state and deployment boundary
 
-`.local/` is ignored by Git, owner-only, and contains database credentials,
-project keys, the engine signing key, its generated configuration, expiry/claim
-information, and test evidence. Setup reuses an existing database and project
-keys. Never commit or publish this directory.
+Private state defaults to `$XDG_STATE_HOME/tisona`, or `~/.local/state/tisona`
+when `XDG_STATE_HOME` is unset. It contains database credentials, project keys,
+the engine signing key, generated configuration, expiry/claim information,
+and test evidence. Directories are owner-only and secret files use mode `0600`.
+Set `RESONATE_STATE_DIR` to override the location; paths inside the source
+checkout are rejected. Setup reuses the existing database and project keys.
+Keep this directory separate from source archives and backups intended for sharing.
 
 Cloud Zero databases expire after the returned `expiresAt`. Before that time,
-use `instance.claimInfo.claimUrl` in `.local/zero.json` to claim the database
+use `instance.claimInfo.claimUrl` in the private state's `zero.json` to claim the database
 through TiDB Cloud if you need to retain it. This MVP does not automatically
 claim or upgrade anything, and does not present a temporary database as
 permanent storage. See [Cloud Zero](https://zero.tidbcloud.com/).
@@ -348,6 +352,19 @@ catalogue and worker presence independently every five seconds while visible,
 and clears transient errors after recovery. Unexpected request failures log
 only a safe error code and request ID; the same ID appears in the response's
 `X-Request-Id` header.
+
+## Secret checks before publishing
+
+Install [Gitleaks](https://github.com/gitleaks/gitleaks) 8.30.1 and run
+`npm run security:scan`. This rejects private configuration filenames, scans
+the public source files and complete Git history, and checks that the scanner
+detects a generated test credential. Set `GITLEAKS_BINARY` for a custom scanner
+location. Scan results never print secret values. GitHub Actions repeats these
+checks for pushes and pull requests. Do not bypass a failed scan to publish.
+Enable the local commit guard with `git config core.hooksPath .githooks`;
+it also scans staged content, including changes no longer in the working tree.
+The example configuration contains only public settings and placeholder paths;
+test credentials are deliberately invalid fixtures or generated at runtime.
 
 ## Persistent control data and operations
 

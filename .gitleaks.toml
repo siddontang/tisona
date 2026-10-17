@@ -1,0 +1,10 @@
+title = "TiSona secret detection"
+
+[extend]
+useDefault = true
+
+[[rules]]
+id = "tisona-project-credential"
+description = "Generated TiSona API credential"
+regex = '''\brc_(?:admin|client|worker|metrics)_[0-9a-fA-F]{64}\b'''
+keywords = ["rc_admin_", "rc_client_", "rc_worker_", "rc_metrics_"]

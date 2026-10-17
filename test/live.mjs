@@ -161,7 +161,7 @@ try {
   assert.equal(canceled.data.state, 'rejected_canceled'); passed('Execution cancellation recorded durably');
   evidence.completedAt = new Date().toISOString(); evidence.passed = true;
   await privateFile('live-results.json', JSON.stringify(evidence, null, 2));
-  console.log(`All live checks passed. Evidence: .local/live-results.json`);
+  console.log('All live checks passed. Evidence: live-results.json in the private state directory.');
 } catch (error) {
   evidence.passed = false; evidence.failure = error.message;
   await privateFile('live-results.json', JSON.stringify(evidence, null, 2));

@@ -19,6 +19,7 @@
     "worker": "node worker.mjs",
     "worker:examples": "node examples/worker.mjs",
     "test": "node --test test/*.test.mjs",
+    "security:scan": "node scripts/check-secrets.mjs",
     "test:live": "node test/live.mjs",
     "test:control-live": "node test/control-live.mjs",
     "test:examples-live": "node test/examples-live.mjs"

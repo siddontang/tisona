@@ -4,8 +4,18 @@ import { mkdtemp, writeFile, rm } from 'node:fs/promises';
 import { tmpdir } from 'node:os';
 import { join } from 'node:path';
 import { generateKeyPairSync } from 'node:crypto';
-import { loadConfig, renderEngineConfig, connectionFromUrl, secret, engineEnvironment, testLoginEnabled } from '../config.mjs';
+import { loadConfig, renderEngineConfig, connectionFromUrl, secret, engineEnvironment, testLoginEnabled, resolveStateDir, dir } from '../config.mjs';
 import { Metrics, metricRoute } from '../metrics.mjs';
+
+test('private runtime configuration stays outside the source checkout even with explicit overrides', () => {
+  const outside = join(tmpdir(), 'tisona-private-state');
+  assert.equal(resolveStateDir({ RESONATE_STATE_DIR: outside }), outside);
+  assert.equal(resolveStateDir({ XDG_STATE_HOME: outside }), join(outside, 'tisona'));
+  for (const path of [dir, join(dir, '.local'), join(dir, 'nested', 'runtime')]) {
+    assert.throws(() => resolveStateDir({ RESONATE_STATE_DIR: path }), /outside the source checkout/);
+  }
+  assert.notEqual(resolveStateDir({}).slice(0, dir.length), dir);
+});
 
 test('production uses persistent database and mounted secrets without requiring Zero state', async t => {
   const path = await mkdtemp(join(tmpdir(), 'resonate-config-')); t.after(() => rm(path, { recursive: true, force: true }));
