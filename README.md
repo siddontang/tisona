@@ -2,7 +2,7 @@
 
 Powered by **Resonate** and **TiDB**. The local preview uses TiDB Cloud Zero.
 
-[Netlify Console deployment](NETLIFY.md) · [Production runbook](PRODUCTION.md) · [Examples](EXAMPLES.md)
+[Automatic Cloudflare + Netlify deployment](CLOUDFLARE.md) · [Netlify Console deployment](NETLIFY.md) · [Production runbook](PRODUCTION.md) · [Examples](EXAMPLES.md)
 
 A runnable **single-project durable execution service**. Application workers
 run as separate processes in the customer's environment. This service owns
@@ -127,8 +127,7 @@ Worker connection details and endpoint setup live under **API access**.
 Resonate provides SDKs for [TypeScript / JavaScript](https://docs.resonatehq.io/develop/typescript),
 [Python](https://docs.resonatehq.io/develop/python), [Go](https://docs.resonatehq.io/develop/go),
 [Java](https://github.com/resonatehq/resonate-sdk-java#quickstart), and
-[Rust](https://docs.resonatehq.io/develop/rust). The API access screen lists all
-five with their package names and quickstarts. Its language tabs provide
+[Rust](https://docs.resonatehq.io/develop/rust). The API access screen's language tabs provide
 TypeScript, JavaScript, Python, Go, Java and Rust workers implementing a
 checkpointed greeting, with installation commands, environment setup, source,
 function publication, presence requests and a version-pinned client API call.

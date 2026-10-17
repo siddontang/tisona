@@ -108,14 +108,7 @@
           <div class="table-scroll"><table id="keys-table"><thead><tr><th>NAME / PREFIX</th><th>ACCESS</th><th>STATUS</th><th>EXPIRES</th><th></th></tr></thead><tbody></tbody></table></div>
         </article>
         <article><div class="section-title"><h2>Project connection</h2><span id="worker-summary" class="status">Checking workers…</span></div><p class="muted">Your worker runs the code. Connect it to this endpoint using a Worker API key, then publish its function manifest.</p><label>Endpoint</label><pre id="endpoint"></pre></article>
-        <article><h2>Connect your worker</h2><p>Choose a Resonate SDK for your worker. Run it separately from the service and keep credentials in your environment or a secret file.</p>
-          <ul class="sdk-list" aria-label="Resonate SDKs">
-            <li><div><strong>TypeScript / JavaScript</strong><span>npm · Node.js</span></div><code>@resonatehq/sdk</code><a href="https://docs.resonatehq.io/develop/typescript" target="_blank" rel="noreferrer" aria-label="TypeScript and JavaScript SDK quickstart">Quickstart ↗</a></li>
-            <li><div><strong>Python</strong><span>PyPI · Python 3.12+</span></div><code>resonate-sdk</code><a href="https://docs.resonatehq.io/develop/python" target="_blank" rel="noreferrer" aria-label="Python SDK quickstart">Quickstart ↗</a></li>
-            <li><div><strong>Go</strong><span>Go module · Early release</span></div><code>resonate-sdk-go</code><a href="https://docs.resonatehq.io/develop/go" target="_blank" rel="noreferrer" aria-label="Go SDK quickstart">Quickstart ↗</a></li>
-            <li><div><strong>Java</strong><span>Maven Central · Java 21+ · Early release</span></div><code>io.resonatehq:resonate-sdk-java</code><a href="https://github.com/resonatehq/resonate-sdk-java#quickstart" target="_blank" rel="noreferrer" aria-label="Java SDK quickstart">Quickstart ↗</a></li>
-            <li><div><strong>Rust</strong><span>crates.io</span></div><code>resonate-sdk</code><a href="https://docs.resonatehq.io/develop/rust" target="_blank" rel="noreferrer" aria-label="Rust SDK quickstart">Quickstart ↗</a></li>
-          </ul>
+        <article><h2>Connect your worker</h2><p>Choose a language for installation and code examples. Run your worker separately and keep credentials in your environment or a secret file.</p>
           <div id="worker-guide"></div>
         </article><article><h2>Agent API</h2><p>Start with an idempotency key. Save the returned execution ID and query its status later.</p><pre id="api-example"></pre><p class="muted">GET /v1/functions · GET /v1/workers · GET /v1/executions · GET /v1/executions/:id · POST /v1/executions/:id/waits · POST /v1/executions/:id/cancel</p></article>
         <article><h2>Monitoring</h2><p class="muted">Public readiness checks and authenticated Prometheus metrics. Use a Metrics only key for scraping.</p><pre id="metrics-example"></pre></article>

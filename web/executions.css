@@ -117,13 +117,6 @@ button:focus-visible, a:focus-visible { outline: 2px solid var(--green); outline
 .audit-entry strong { color: var(--text-2); font-weight: 500; }
 .audit-entry small { font-size: 10px; margin-left: auto; }
 #step-input-note { margin: 7px 0; font-size: 10px; }
-.sdk-list { list-style: none; padding: 0; margin: 22px 0 26px; border: 1px solid var(--line); border-radius: 8px; overflow: hidden; }
-.sdk-list li { display: grid; grid-template-columns: minmax(160px, 1fr) minmax(0, 1.3fr) auto; gap: 16px; align-items: center; padding: 15px 17px; border-bottom: 1px solid var(--line); }
-.sdk-list li:last-child { border-bottom: 0; }
-.sdk-list strong { display: block; font-size: 12px; font-weight: 600; }
-.sdk-list span { display: block; margin-top: 3px; color: var(--muted); font-size: 10px; }
-.sdk-list code { font-size: 11px; color: var(--text-2); overflow-wrap: anywhere; }
-.sdk-list a { font-size: 11px; white-space: nowrap; }
 .sdk-tabs { display: flex; flex-wrap: wrap; gap: 5px; padding-bottom: 12px; margin: 28px 0 20px; border-bottom: 1px solid var(--line); }
 .sdk-tabs button { padding: 8px 13px; background: transparent; border: 1px solid transparent; color: var(--muted); font-size: 12px; font-weight: 500; }
 .sdk-tabs button[aria-selected="true"] { background: var(--selected); border-color: var(--success-border); color: var(--accent); }
@@ -187,9 +180,6 @@ button:focus-visible, a:focus-visible { outline: 2px solid var(--green); outline
   .execution-workspace { grid-template-columns: minmax(255px, .8fr) minmax(0, 1.2fr); gap: 15px; }
 }
 @media(max-width: 950px) {
-  .sdk-list li { grid-template-columns: minmax(0, 1fr) auto; gap: 7px 12px; }
-  .sdk-list code { grid-column: 1; grid-row: 2; }
-  .sdk-list a { grid-column: 2; grid-row: 1 / span 2; align-self: center; }
   .examples-grid { grid-template-columns: 1fr; }
   .execution-workspace { grid-template-columns: 1fr; }
   .execution-facts { grid-template-columns: repeat(2, 1fr); }

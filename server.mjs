@@ -104,7 +104,7 @@ export function createApp(config, db, { logError = console.error, store = new Co
             Promise.all([fetch(config.engineUrl + '/ready', { signal: AbortSignal.timeout(probeTimeoutMs) }), store.ready()]),
             new Promise((_, reject) => { timeout = setTimeout(() => reject(new ApiError(503, 'Readiness check timed out')), probeTimeoutMs); })
           ]);
-          return json(res, engine.ok && control ? 200 : 503, { ready: engine.ok && control });
+          return json(res, engine.ok && control ? 200 : 503, { ready: engine.ok && control, ...(config.release ? { release: config.release } : {}) });
         } finally { clearTimeout(timeout); }
       }
       // Netlify forwards the configured Console origin through its API proxy.
@@ -142,7 +142,7 @@ export function createApp(config, db, { logError = console.error, store = new Co
         return json(res, 200, {}, { 'Set-Cookie': 'rc_session=; HttpOnly; SameSite=Strict; Path=/; Max-Age=0' });
       }
       if (url.pathname === '/v1/project' && req.method === 'GET') return json(res, 200, {
-        id: config.project, name: config.projectName, role, endpoint: config.publicUrl, databaseExpiresAt: config.zero?.expiresAt ?? null, keyId: actor.id,
+        id: config.project, name: config.projectName, role, endpoint: config.publicUrl, databaseExpiresAt: config.databaseExpiresAt ?? config.zero?.expiresAt ?? null, keyId: actor.id,
         consoleUrl: config.consoleUrl ? `${config.consoleUrl}/#executions` : '/#executions'
       });
       if (url.pathname === '/v1/credentials' && req.method === 'POST') {

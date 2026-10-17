@@ -1,0 +1,15 @@
+node_modules
+.git
+.github
+.local
+.vendor
+.netlify
+.netlify-dist
+.wrangler
+.env
+.env.*
+.dev.vars*
+*.pem
+*.key
+*.log
+.DS_Store

@@ -61,7 +61,8 @@ export function validateConfig(config) {
   }
   if (config.mode === 'production' && !config.publicUrl.startsWith('https://')) throw new Error('Production public URL requires HTTPS');
   if (config.mode === 'production' && config.consoleUrl && !config.consoleUrl.startsWith('https://')) throw new Error('Production console URL requires HTTPS');
-  if (config.zero?.expiresAt && Date.parse(config.zero.expiresAt) <= Date.now()) throw new Error('Temporary database expired. Claim it or configure a persistent database.');
+  const expiresAt = config.databaseExpiresAt ?? config.zero?.expiresAt;
+  if (expiresAt && (!Number.isFinite(Date.parse(expiresAt)) || Date.parse(expiresAt) <= Date.now())) throw new Error('Temporary database expired. Claim it or configure a persistent database.');
   return config;
 }
 export async function loadConfig(env = process.env) {
@@ -89,8 +90,10 @@ export async function loadConfig(env = process.env) {
     engineMetricsUrl: env.RESONATE_ENGINE_METRICS_URL ?? 'http://127.0.0.1:9091/metrics',
     databaseRelay: env.RESONATE_DATABASE_RELAY === 'true' || mode !== 'production' && env.RESONATE_DATABASE_RELAY !== 'false',
     privateKey, publicKeyPath, testAutoLogin: env.RESONATE_TEST_AUTO_LOGIN !== 'false',
+    databaseExpiresAt: env.RESONATE_DATABASE_EXPIRES_AT || zero?.expiresAt, release: env.TISONA_RELEASE,
     adminKey: await secret(env, 'RESONATE_BOOTSTRAP_ADMIN_KEY') ?? (mode === 'development' ? runtime.adminKey : undefined),
-    clientKey: mode === 'development' ? runtime.clientKey : undefined, workerKey: mode === 'development' ? runtime.workerKey : undefined };
+    clientKey: await secret(env, 'RESONATE_BOOTSTRAP_CLIENT_KEY') ?? (mode === 'development' ? runtime.clientKey : undefined),
+    workerKey: await secret(env, 'RESONATE_BOOTSTRAP_WORKER_KEY') ?? (mode === 'development' ? runtime.workerKey : undefined) };
   config.importLegacyFunctions = env.RESONATE_IMPORT_LEGACY_FUNCTIONS === 'true' || mode === 'development' && config.project === runtime.project;
   return validateConfig(config);
 }

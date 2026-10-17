@@ -3,6 +3,8 @@ node_modules/
 .vendor/
 .netlify/
 .netlify-dist/
+.wrangler/
+.dev.vars*
 .env
 .env.*
 !.env.example

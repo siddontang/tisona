@@ -1,5 +1,9 @@
 # Deploy the Console on Netlify
 
+For the automated GitHub → Cloudflare Containers backend → Netlify Console
+workflow, use [CLOUDFLARE.md](CLOUDFLARE.md). The instructions below also support
+an independently managed Linux backend.
+
 Netlify can host the Console and proxy its short browser API requests. The
 complete service cannot run entirely on Netlify with the current architecture:
 the Resonate Rust engine advances durable timers continuously, the Node gateway
