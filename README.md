@@ -12,6 +12,41 @@ SDK, HTTP/SSE transport, and execution read model without modifying them. Its
 Web Console runs as an independent frontend and uses the backend REST API.
 It does not embed or load the upstream Console.
 
+## See it work
+
+These illustrated previews follow the bundled example flows. Business tools
+are simulated; running the examples locally uses real Resonate executions
+with progress persisted in TiDB.
+
+**Retry a failed tool. Keep the saved plan.** Two rate limits trigger durable
+waits before a successful third attempt. The completed plan stays saved.
+
+![A saved plan survives two recorded rate limits and durable waits before the tool succeeds.](docs/animations/tool-retry.gif)
+
+<details>
+<summary><strong>Human approval: wait for a decision, then resume</strong></summary>
+
+The refund waits for approval. Saved policy checks and the pending decision
+survive a worker going offline; the refund happens after approval.
+
+![A refund keeps its saved policy checks while waiting for human approval and resumes after the decision.](docs/animations/support-refund.gif)
+
+</details>
+
+<details>
+<summary><strong>Order compensation: recover after shipping fails</strong></summary>
+
+After a shipping failure, the workflow records a payment refund and releases
+inventory. The failure and both recovery actions remain visible.
+
+![Shipping fails after inventory and payment are saved; compensation refunds the payment and releases inventory.](docs/animations/order-saga.gif)
+
+</details>
+
+To try these flows, follow **Start** below, run `npm run worker:examples` in
+another terminal, and open **Overview** or **Examples**. The Console's live
+animation follows saved execution state. [Animation source and rebuild instructions](docs/animations/README.md).
+
 ## Start
 
 Requires Node.js 22+, npm, Git, Rust/Cargo, and network access. No TiDB account,
