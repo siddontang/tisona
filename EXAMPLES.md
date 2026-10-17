@@ -94,7 +94,7 @@ with an offline worker, decline behavior, SIGKILL during backoff, preservation
 of a completed planning checkpoint, retry exhaustion, compensation ordering,
 successful fulfillment and overlapping document branches. It never stops the
 service or deletes existing execution data. Private evidence is written to
-`examples-live-results.json` in the private state directory outside the checkout;
+`examples-live-results.json` in the Git-ignored private state directory `.local/`;
 logs and audit fixtures remain there as well (see README).
 
 ## Use from an agent

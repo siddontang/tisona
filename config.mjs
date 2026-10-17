@@ -1,16 +1,12 @@
 import { readFile, mkdir, writeFile, chmod } from 'node:fs/promises';
 import { fileURLToPath } from 'node:url';
 import { resolve } from 'node:path';
-import { homedir } from 'node:os';
 import { createHash, sign, createPrivateKey, createPublicKey } from 'node:crypto';
 import { databaseStream } from './network.mjs';
 
 export const dir = fileURLToPath(new URL('.', import.meta.url));
 export function resolveStateDir(env = process.env) {
-  const path = resolve(env.RESONATE_STATE_DIR ?? resolve(env.XDG_STATE_HOME ?? resolve(homedir(), '.local', 'state'), 'tisona'));
-  const checkout = resolve(dir);
-  if (path === checkout || path.startsWith(checkout + '/')) throw new Error('Private runtime state must be outside the source checkout');
-  return path;
+  return resolve(env.RESONATE_STATE_DIR ?? resolve(dir, '.local'));
 }
 export const stateDir = resolveStateDir();
 export const databaseSocket = resolve(stateDir, 'tidb.sock');

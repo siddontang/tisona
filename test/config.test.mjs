@@ -7,14 +7,13 @@ import { generateKeyPairSync } from 'node:crypto';
 import { loadConfig, renderEngineConfig, connectionFromUrl, secret, engineEnvironment, testLoginEnabled, resolveStateDir, dir } from '../config.mjs';
 import { Metrics, metricRoute } from '../metrics.mjs';
 
-test('private runtime configuration stays outside the source checkout even with explicit overrides', () => {
+test('runtime state defaults to the ignored local directory and supports custom locations', () => {
   const outside = join(tmpdir(), 'tisona-private-state');
+  assert.equal(resolveStateDir({}), join(dir, '.local'));
   assert.equal(resolveStateDir({ RESONATE_STATE_DIR: outside }), outside);
-  assert.equal(resolveStateDir({ XDG_STATE_HOME: outside }), join(outside, 'tisona'));
-  for (const path of [dir, join(dir, '.local'), join(dir, 'nested', 'runtime')]) {
-    assert.throws(() => resolveStateDir({ RESONATE_STATE_DIR: path }), /outside the source checkout/);
+  for (const path of [join(dir, '.local'), join(dir, 'nested', 'runtime')]) {
+    assert.equal(resolveStateDir({ RESONATE_STATE_DIR: path }), path);
   }
-  assert.notEqual(resolveStateDir({}).slice(0, dir.length), dir);
 });
 
 test('production uses persistent database and mounted secrets without requiring Zero state', async t => {

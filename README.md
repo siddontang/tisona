@@ -31,8 +31,8 @@ npm start
 Bootstrap downloads the unmodified Resonate engine at the exact upstream
 revision in `engine-source.json`, builds it under `.vendor/`, and configures
 the local TiDB preview. The TypeScript SDK is pinned to npm version `0.11.5`;
-no sibling Resonate checkout is required. `.vendor/` is ignored; private runtime
-state is stored outside the checkout.
+no sibling Resonate checkout is required. `.vendor/` and the private runtime
+state directory `.local/` are ignored by Git.
 
 This repository is licensed under [Apache-2.0](LICENSE); see [NOTICE](NOTICE).
 
@@ -326,13 +326,15 @@ certification of the MySQL backend on TiDB.
 
 ## Local state and deployment boundary
 
-Private state defaults to `$XDG_STATE_HOME/tisona`, or `~/.local/state/tisona`
-when `XDG_STATE_HOME` is unset. It contains database credentials, project keys,
+Private state defaults to `.local/` inside the project. It contains database credentials, project keys,
 the engine signing key, generated configuration, expiry/claim information,
 and test evidence. Directories are owner-only and secret files use mode `0600`.
-Set `RESONATE_STATE_DIR` to override the location; paths inside the source
-checkout are rejected. Setup reuses the existing database and project keys.
-Keep this directory separate from source archives and backups intended for sharing.
+Set `RESONATE_STATE_DIR` to override the location, either inside or outside the
+checkout. Setup reuses the existing database and project keys. `.gitignore`
+excludes `.local/`, `.env`, private environment files and key files; only
+placeholder example configurations are tracked. Commit guards reject private
+configuration even if it is force-staged. Share source through Git or `git archive`
+so private local files remain excluded.
 
 Cloud Zero databases expire after the returned `expiresAt`. Before that time,
 use `instance.claimInfo.claimUrl` in the private state's `zero.json` to claim the database
