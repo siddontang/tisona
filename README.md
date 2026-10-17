@@ -2,15 +2,15 @@
 
 Powered by **Resonate** and **TiDB**. The local preview uses TiDB Cloud Zero.
 
-[Automatic Cloudflare + Netlify deployment](CLOUDFLARE.md) · [Netlify Console deployment](NETLIFY.md) · [Production runbook](PRODUCTION.md) · [Examples](EXAMPLES.md)
+[Production runbook](PRODUCTION.md) · [Examples](EXAMPLES.md)
 
 A runnable **single-project durable execution service**. Application workers
 run as separate processes in the customer's environment. This service owns
 the endpoint, durable state, function catalogue, asynchronous API, credentials,
 and browser session. It reuses the existing Resonate MySQL engine, TypeScript
 SDK, HTTP/SSE transport, and execution read model without modifying them. Its
-Web Console is built directly into the cloud application and uses the REST API;
-it does not embed or load the upstream Console.
+Web Console runs as an independent frontend and uses the backend REST API.
+It does not embed or load the upstream Console.
 
 ## Start
 
@@ -33,9 +33,7 @@ revision in `engine-source.json`, builds it under `.vendor/`, and configures
 the local TiDB preview. The TypeScript SDK is pinned to npm version `0.11.5`;
 no sibling Resonate checkout is required. `.vendor/` and `.local/` are ignored.
 
-For Netlify, deploy only the Console with an external HTTPS backend. See
-[NETLIFY.md](NETLIFY.md) for the supported split and required settings. This
-repository is licensed under [Apache-2.0](LICENSE); see [NOTICE](NOTICE).
+This repository is licensed under [Apache-2.0](LICENSE); see [NOTICE](NOTICE).
 
 Open <http://127.0.0.1:8787>. Local development opens the Console automatically
 using a normal server-issued session; no key entry is required. Set
@@ -66,10 +64,29 @@ Local SDK checkpoints do not persist their function arguments. The inspector
 labels their saved function/version as invocation metadata; remote calls and
 root executions show the arguments that were actually recorded.
 
-The gateway binds `127.0.0.1:8787`; the JWT-protected engine binds
-`127.0.0.1:8001`. These are local development endpoints, not a public deployment.
-`npm start` starts the engine and gateway together and shuts both down when
-interrupted. The worker has an independent lifecycle.
+The frontend binds `127.0.0.1:8787`, the backend API binds `127.0.0.1:8788`,
+and the private JWT-protected engine binds `127.0.0.1:8001`. `npm start` starts
+these three processes together and shuts them down when interrupted. Workers
+have an independent lifecycle and connect directly to the API on port 8788.
+
+To manage the frontend and backend separately, run these in two terminals
+instead of `npm start`:
+
+```sh
+npm run backend
+npm run console
+```
+
+The frontend serves only public assets and forwards browser `/session` and
+`/v1/*` requests to the backend. It needs no database credentials, signing keys
+or API secrets. The backend serves API and worker transport, not HTML assets.
+Use `TISONA_API_URL` and `TISONA_CONSOLE_URL` for the standalone frontend;
+set `RESONATE_PUBLIC_URL` and `RESONATE_CONSOLE_URL` on the backend to the same
+respective origins. See [.env.example](.env.example) for local settings.
+`npm run build:console` creates public files in `dist/console`; serve that build
+with `TISONA_CONSOLE_DIR=dist/console npm run console`. The existing local setup
+migrates from the old single-port preview without replacing its database or keys.
+GitHub Actions runs tests and builds the Console; it does not deploy services.
 
 ## Overview and runnable examples
 

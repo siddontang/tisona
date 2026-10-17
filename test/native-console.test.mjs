@@ -49,10 +49,10 @@ test('native Console API exposes lineage and payloads, validates global filters,
   const legacy = await request('/console/executions/starter-run', { redirect: 'manual' });
   assert.equal(legacy.status, 302); assert.equal(legacy.headers.get('location'), '/#executions/starter-run');
   assert.equal((await request('/console/rpc', { method: 'POST', body: '{}' })).status, 404);
-  const html = await request('/'); assert.match(html.headers.get('content-security-policy'), /frame-src 'none'/);
-  assert.doesNotMatch(await html.text(), /<iframe|\/console\//);
-  assert.equal((await request('/executions.css')).status, 200);
-  for (const path of ['/walkthrough.js', '/walkthrough-data.js', '/live-execution.js', '/walkthrough.css', '/example-studio.js', '/example-session.js', '/studio.css', '/theme.css', '/theme.js', '/execution-create.js', '/execution-input.js', '/execution-create.css', '/worker-guide.js', '/worker-examples.js']) assert.equal((await request(path)).status, 200);
+  for (const path of ['/', '/app.js', '/executions.css']) {
+    const response = await request(path); assert.equal(response.status, 404);
+    assert.match(response.headers.get('content-type'), /application\/json/);
+  }
 });
 
 async function webHarness() {

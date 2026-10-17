@@ -1,10 +1,7 @@
 node_modules/
 .local/
 .vendor/
-.netlify/
-.netlify-dist/
-.wrangler/
-.dev.vars*
+dist/
 .env
 .env.*
 !.env.example

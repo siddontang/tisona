@@ -78,18 +78,37 @@ Existing executions retain their request identities and remain queryable.
 
 Install the edited `deploy/resonate-cloud.service` unit and start it through the
 host's service manager. It runs the release engine and Node gateway under one
-supervised service and restarts on failure. `npm start` uses the same launcher.
+supervised service and restarts on failure. It uses `npm run backend`'s launcher;
+the frontend has a separate process and configuration.
 Keep one active engine; gateway replicas require the same project, control
 database, signing configuration and public origin, while the engine remains
 single-active.
 
-Place an HTTPS reverse proxy in front of `127.0.0.1:8787`. It must preserve the
+Place an HTTPS reverse proxy in front of the backend at `127.0.0.1:8788`. It must preserve the
 Authorization header, allow outbound worker SSE subscriptions, and avoid
 buffering or short timeouts for `text/event-stream`. Set `RESONATE_PUBLIC_URL`
 to the external HTTPS origin. Browser cookies are then Secure. Keep engine port
 8001 and engine metrics port 9091 private. Do not use the cloud-service
 environment as direct Rust engine overrides; the launcher filters it and uses
 the generated TOML instead.
+
+Run the frontend separately with only public settings. For example, behind an
+HTTPS reverse proxy forwarding `https://console.example.com` to local port 8787:
+
+```sh
+NODE_ENV=production \
+  TISONA_API_URL=https://api.example.com \
+  TISONA_CONSOLE_URL=https://console.example.com \
+  TISONA_CONSOLE_PORT=8787 \
+  npm run console
+```
+
+Set the backend's `RESONATE_PUBLIC_URL=https://api.example.com` and
+`RESONATE_CONSOLE_URL=https://console.example.com`. Manage the frontend with its
+own supervisor and keep backend secrets out of its environment. Browser API
+and session requests use the Console's same-origin proxy; agent calls and
+worker SSE connections use the API origin directly. Both public origins require
+HTTPS. The frontend can serve a prebuilt bundle using `TISONA_CONSOLE_DIR`.
 
 The production DNS path is direct MySQL/TLS. If a deployment explicitly needs
 the development byte relay, set `RESONATE_DATABASE_RELAY=true` and rerun setup.

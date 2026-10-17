@@ -61,7 +61,7 @@ export function validateConfig(config) {
   }
   if (config.mode === 'production' && !config.publicUrl.startsWith('https://')) throw new Error('Production public URL requires HTTPS');
   if (config.mode === 'production' && config.consoleUrl && !config.consoleUrl.startsWith('https://')) throw new Error('Production console URL requires HTTPS');
-  const expiresAt = config.databaseExpiresAt ?? config.zero?.expiresAt;
+  const expiresAt = config.zero?.expiresAt;
   if (expiresAt && (!Number.isFinite(Date.parse(expiresAt)) || Date.parse(expiresAt) <= Date.now())) throw new Error('Temporary database expired. Claim it or configure a persistent database.');
   return config;
 }
@@ -83,17 +83,15 @@ export async function loadConfig(env = process.env) {
   const config = { ...runtime, mode, stateDir: local, zero, connection, databaseUrl: external ?? zero.connectionString,
     database: external ? connection.database : runtime.database ?? 'resonate_mvp',
     project: env.RESONATE_PROJECT_ID ?? runtime.project ?? 'starter', projectName: env.RESONATE_PROJECT_NAME ?? runtime.projectName ?? 'Starter project',
-    bind: env.RESONATE_BIND ?? runtime.bind ?? '127.0.0.1', port: Number(env.RESONATE_PORT ?? runtime.port ?? 8787),
-    publicUrl: (env.RESONATE_PUBLIC_URL ?? runtime.publicUrl ?? 'http://127.0.0.1:8787').replace(/\/$/, ''),
-    consoleUrl: env.RESONATE_CONSOLE_URL?.replace(/\/$/, ''),
+    bind: env.RESONATE_BIND ?? runtime.bind ?? '127.0.0.1', port: Number(env.RESONATE_PORT ?? runtime.port ?? 8788),
+    publicUrl: (env.RESONATE_PUBLIC_URL ?? runtime.publicUrl ?? 'http://127.0.0.1:8788').replace(/\/$/, ''),
+    consoleUrl: (env.RESONATE_CONSOLE_URL ?? runtime.consoleUrl ?? (mode === 'development' ? 'http://127.0.0.1:8787' : undefined))?.replace(/\/$/, ''),
     engineUrl: (env.RESONATE_ENGINE_URL ?? runtime.engineUrl ?? 'http://127.0.0.1:8001').replace(/\/$/, ''),
     engineMetricsUrl: env.RESONATE_ENGINE_METRICS_URL ?? 'http://127.0.0.1:9091/metrics',
     databaseRelay: env.RESONATE_DATABASE_RELAY === 'true' || mode !== 'production' && env.RESONATE_DATABASE_RELAY !== 'false',
     privateKey, publicKeyPath, testAutoLogin: env.RESONATE_TEST_AUTO_LOGIN !== 'false',
-    databaseExpiresAt: env.RESONATE_DATABASE_EXPIRES_AT || zero?.expiresAt, release: env.TISONA_RELEASE,
     adminKey: await secret(env, 'RESONATE_BOOTSTRAP_ADMIN_KEY') ?? (mode === 'development' ? runtime.adminKey : undefined),
-    clientKey: await secret(env, 'RESONATE_BOOTSTRAP_CLIENT_KEY') ?? (mode === 'development' ? runtime.clientKey : undefined),
-    workerKey: await secret(env, 'RESONATE_BOOTSTRAP_WORKER_KEY') ?? (mode === 'development' ? runtime.workerKey : undefined) };
+    clientKey: mode === 'development' ? runtime.clientKey : undefined, workerKey: mode === 'development' ? runtime.workerKey : undefined };
   config.importLegacyFunctions = env.RESONATE_IMPORT_LEGACY_FUNCTIONS === 'true' || mode === 'development' && config.project === runtime.project;
   return validateConfig(config);
 }

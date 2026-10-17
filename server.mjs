@@ -1,5 +1,4 @@
 import http from 'node:http';
-import { readFile } from 'node:fs/promises';
 import { randomBytes } from 'node:crypto';
 import { pipeline } from 'node:stream/promises';
 import { Readable } from 'node:stream';
@@ -104,10 +103,10 @@ export function createApp(config, db, { logError = console.error, store = new Co
             Promise.all([fetch(config.engineUrl + '/ready', { signal: AbortSignal.timeout(probeTimeoutMs) }), store.ready()]),
             new Promise((_, reject) => { timeout = setTimeout(() => reject(new ApiError(503, 'Readiness check timed out')), probeTimeoutMs); })
           ]);
-          return json(res, engine.ok && control ? 200 : 503, { ready: engine.ok && control, ...(config.release ? { release: config.release } : {}) });
+          return json(res, engine.ok && control ? 200 : 503, { ready: engine.ok && control });
         } finally { clearTimeout(timeout); }
       }
-      // Netlify forwards the configured Console origin through its API proxy.
+      // The independent Console forwards the original browser origin.
       if (req.headers.origin) check([config.publicUrl, config.consoleUrl].filter(Boolean).some(value => req.headers.origin === new URL(value).origin), 'Cross-origin request refused', 403);
       const localTestLogin = testLoginEnabled(config) && isLoopback(req.socket.remoteAddress)
         && req.headers.host === new URL(config.publicUrl).host;
@@ -124,13 +123,6 @@ export function createApp(config, db, { logError = console.error, store = new Co
         await store.createSession(digest(token), actor, Date.now() + 8 * 3600000);
         return json(res, 200, { signedIn: true }, { 'Set-Cookie': `rc_session=${token}; HttpOnly; SameSite=Strict; Path=/; Max-Age=28800${config.publicUrl.startsWith('https:') ? '; Secure' : ''}` });
       }
-      if (req.method === 'GET' && ['/', '/app.js', '/style.css', '/executions.css', '/walkthrough.js', '/walkthrough-data.js', '/live-execution.js', '/walkthrough.css', '/example-session.js', '/example-studio.js', '/studio.css', '/theme.js', '/theme.css', '/execution-create.js', '/execution-input.js', '/execution-create.css', '/worker-guide.js', '/worker-examples.js'].includes(url.pathname)) {
-        const file = url.pathname === '/' ? 'index.html' : url.pathname.slice(1);
-        const type = file.endsWith('.js') ? 'text/javascript' : file.endsWith('.css') ? 'text/css' : 'text/html';
-        res.writeHead(200, { 'Content-Type': type + '; charset=utf-8', 'Cache-Control': 'no-store',
-          'Content-Security-Policy': "default-src 'self'; script-src 'self'; style-src 'self'; frame-src 'none'; connect-src 'self'; base-uri 'none'; form-action 'self'; frame-ancestors 'self'" });
-        return res.end(await readFile(new URL(`./web/${file}`, import.meta.url)));
-      }
       const bearer = req.headers.authorization?.match(/^Bearer (.+)$/)?.[1];
       const cookie = req.headers.cookie?.match(/(?:^|;\s*)rc_session=([a-f0-9]{64})(?:;|$)/)?.[1];
       const actor = bearer ? await store.authenticate(bearer) : cookie ? await store.authenticateSession(digest(cookie)) : undefined;
@@ -142,7 +134,7 @@ export function createApp(config, db, { logError = console.error, store = new Co
         return json(res, 200, {}, { 'Set-Cookie': 'rc_session=; HttpOnly; SameSite=Strict; Path=/; Max-Age=0' });
       }
       if (url.pathname === '/v1/project' && req.method === 'GET') return json(res, 200, {
-        id: config.project, name: config.projectName, role, endpoint: config.publicUrl, databaseExpiresAt: config.databaseExpiresAt ?? config.zero?.expiresAt ?? null, keyId: actor.id,
+        id: config.project, name: config.projectName, role, endpoint: config.publicUrl, databaseExpiresAt: config.zero?.expiresAt ?? null, keyId: actor.id,
         consoleUrl: config.consoleUrl ? `${config.consoleUrl}/#executions` : '/#executions'
       });
       if (url.pathname === '/v1/credentials' && req.method === 'POST') {
@@ -297,7 +289,7 @@ export function createApp(config, db, { logError = console.error, store = new Co
         // Preserve old bookmarks while keeping the product on its native UI.
         const id = url.pathname.match(/^\/console\/executions\/([^/]+)\/?$/)?.[1];
         const target = id ? `/#executions/${encodeURIComponent(decodeURIComponent(id))}` : url.pathname.endsWith('/settings') ? '/#access' : '/#executions';
-        res.writeHead(302, { Location: target, 'Cache-Control': 'no-store' }); return res.end();
+        res.writeHead(302, { Location: `${config.consoleUrl ?? ''}${target}`, 'Cache-Control': 'no-store' }); return res.end();
       }
       throw new ApiError(404, 'Endpoint not found');
     } catch (error) {

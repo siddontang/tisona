@@ -1,4 +1,4 @@
-import { access } from 'node:fs/promises';
+import { access, readFile } from 'node:fs/promises';
 import { randomBytes, generateKeyPairSync } from 'node:crypto';
 import { resolve } from 'node:path';
 import mysql from 'mysql2/promise';
@@ -20,8 +20,14 @@ if (!production) {
   }
   if (!await exists(resolve(stateDir, 'runtime.json'))) {
     await privateFile('runtime.json', JSON.stringify({ project: 'starter', projectName: 'Starter project', database: 'resonate_mvp',
-      bind: '127.0.0.1', port: 8787, engineUrl: 'http://127.0.0.1:8001', publicUrl: 'http://127.0.0.1:8787',
+      bind: '127.0.0.1', port: 8788, engineUrl: 'http://127.0.0.1:8001', publicUrl: 'http://127.0.0.1:8788', consoleUrl: 'http://127.0.0.1:8787',
       adminKey: `rc_admin_${randomBytes(32).toString('hex')}`, clientKey: `rc_client_${randomBytes(32).toString('hex')}`, workerKey: `rc_worker_${randomBytes(32).toString('hex')}` }, null, 2));
+  }
+  // Upgrade the original single-port local preview without changing its keys/DB.
+  const runtimePath = resolve(stateDir, 'runtime.json');
+  const localRuntime = JSON.parse(await readFile(runtimePath, 'utf8'));
+  if (!localRuntime.consoleUrl && localRuntime.publicUrl === 'http://127.0.0.1:8787' && localRuntime.port === 8787) {
+    await privateFile('runtime.json', JSON.stringify({ ...localRuntime, port: 8788, publicUrl: 'http://127.0.0.1:8788', consoleUrl: 'http://127.0.0.1:8787' }, null, 2));
   }
   if (!await exists(resolve(stateDir, 'engine-private.pem'))) {
     const keys = generateKeyPairSync('ed25519');
@@ -50,4 +56,4 @@ if (!production) {
   await privateFile('worker.env', `RESONATE_URL=${config.publicUrl}\nRESONATE_TOKEN=${config.workerKey}\n`);
   await privateFile('client.env', `RESONATE_URL=${config.publicUrl}\nRESONATE_TOKEN=${config.clientKey}\n`);
 }
-console.log(`Setup ready: ${config.publicUrl}. Bootstrap credentials are imported only once; revoked keys are never reseeded.`);
+console.log(`API ready to start: ${config.publicUrl}; Web Console: ${config.consoleUrl ?? 'configure separately'}. Bootstrap credentials are imported only once; revoked keys are never reseeded.`);

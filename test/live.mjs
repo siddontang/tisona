@@ -48,10 +48,12 @@ async function api(path, { role = 'client', method = 'GET', body, key } = {}) {
 }
 function passed(name) { evidence.checks.push(name); console.log(`PASS ${name}`); }
 let engine, gateway, worker, relay;
+const consoleUrl = config.consoleUrl;
+assert.ok(consoleUrl, 'Configure the independent Console URL before running live tests');
 try {
   // Refuse to run against a service owned by someone else: the restart check
   // must only terminate processes this script created.
-  for (const endpoint of [config.publicUrl + '/healthz', config.engineUrl + '/ready']) {
+  for (const endpoint of [config.publicUrl + '/healthz', consoleUrl + '/health/live', config.engineUrl + '/ready']) {
     let busy = false; try { await fetch(endpoint, { signal: AbortSignal.timeout(1000) }); busy = true; } catch {}
     assert.equal(busy, false, 'Stop npm start / the existing service before running live tests');
   }
@@ -70,7 +72,9 @@ try {
   relay = await startDatabaseRelay(config);
   engine = start(engineBinary, ['serve', '--config', resolve(stateDir, 'resonate.toml')]);
   gateway = start(process.execPath, ['server.mjs']);
+  start(process.execPath, ['console.mjs'], { TISONA_API_URL: config.publicUrl, TISONA_CONSOLE_URL: consoleUrl });
   await waitFor('service readiness', async () => (await fetch(config.publicUrl + '/healthz')).ok);
+  await waitFor('Console readiness', async () => (await fetch(consoleUrl + '/health/live')).ok);
   passed('Unmodified Resonate MySQL migrations and authenticated engine startup');
   assert.equal((await fetch(config.publicUrl + '/v1/project')).status, 401);
   assert.equal((await api('/v1/credentials', { method: 'POST' })).status, 403);
@@ -110,17 +114,17 @@ try {
   const events = (await readFile(auditPath, 'utf8')).trim().split('\n').map(JSON.parse).filter(e => e.execution === id);
   assert.equal(events.length, 1, 'Completed plan step must not be executed again');
   passed('Persisted result returned; completed checkpoint executed only once across restarts');
-  const login = await fetch(config.publicUrl + '/session', { method: 'POST', body: JSON.stringify({ key: config.adminKey }) });
+  const login = await fetch(consoleUrl + '/session', { method: 'POST', body: JSON.stringify({ key: config.adminKey }) });
   assert.equal(login.status, 200); const cookie = login.headers.get('set-cookie').split(';')[0];
   await stop(gateway);
   gateway = start(process.execPath, ['server.mjs']);
   await waitFor('gateway restart', async () => (await fetch(config.publicUrl + '/healthz')).ok);
-  assert.equal((await fetch(config.publicUrl + '/v1/project', { headers: { cookie } })).status, 200);
+  assert.equal((await fetch(consoleUrl + '/v1/project', { headers: { cookie } })).status, 200);
   passed('Browser session survives an actual gateway process restart');
-  const page = await fetch(config.publicUrl + '/', { headers: { cookie } });
+  const page = await fetch(consoleUrl + '/', { headers: { cookie } });
   assert.equal(page.status, 200); const html = await page.text();
   assert.match(html, /id="execution-steps"/); assert.doesNotMatch(html, /<iframe|\/console\//);
-  const nativeRead = await fetch(config.publicUrl + `/v1/executions/${id}`, { headers: { cookie } });
+  const nativeRead = await fetch(consoleUrl + `/v1/executions/${id}`, { headers: { cookie } });
   const nativeView = await nativeRead.json();
   assert.equal(nativeRead.status, 200); assert.equal(nativeView.state, 'resolved');
   assert.ok(nativeView.steps.some(step => step.function === 'plan' && step.parentId === id && step.createdAt));
@@ -128,8 +132,8 @@ try {
   const filtered = await api(`/v1/executions?idPrefix=${id}&state=resolved&func=research&limit=1`);
   assert.equal(filtered.status, 200); assert.equal(filtered.data.items[0].id, id);
   const oldLink = await fetch(config.publicUrl + `/console/executions/${id}`, { headers: { cookie }, redirect: 'manual' });
-  assert.equal(oldLink.status, 302); assert.equal(oldLink.headers.get('location'), `/#executions/${id}`);
-  passed('Native Console, REST step inspection, exact history filters, and durable deep links');
+  assert.equal(oldLink.status, 302); assert.equal(oldLink.headers.get('location'), `${consoleUrl}/#executions/${id}`);
+  passed('Independent Console, proxied REST step inspection, exact history filters, and durable deep links');
   const fn = `upgrade-${randomUUID().slice(0, 12)}`; fixtureFunctions.push(fn);
   const versionOne = { name: fn, version: 1, group: `${fn}-v1`, description: 'Disposable version fixture', inputSchema: { type: 'object', required: ['topic'], properties: { topic: { type: 'string' } } } };
   assert.equal((await api('/v1/functions', { role: 'worker', method: 'POST', body: versionOne })).status, 200);
